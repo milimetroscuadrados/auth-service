@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: oauth-service
+
+server:
+  port: 9999
+  context-path: /uaa
+
+linkedin:
+  client:
+    clientId: ${SOCIAL_LINKEDIN_APP_ID}
+    clientSecret: ${SOCIAL_LINKEDIN_APP_SECRET}
+    accessTokenUri: https://www.linkedin.com/oauth/v2/accessToken
+    userAuthorizationUri: https://www.linkedin.com/oauth/v2/authorization
+    clientAuthenticationScheme: form
+  resource:
+    userInfoUri: https://api.linkedin.com/v1/people/~:(id,first-name,last-name,picture-url,email-address)?format=json
+
+facebook:
+  client:
+    clientId: ${SOCIAL_FACEBOOK_APP_ID}
+    clientSecret: ${SOCIAL_FACEBOOK_APP_SECRET}
+    accessTokenUri: https://graph.facebook.com/oauth/access_token
+    userAuthorizationUri: https://www.facebook.com/dialog/oauth
+    tokenName: oauth_token
+    authenticationScheme: query
+    clientAuthenticationScheme: form
+    scope:
+      - public_profile
+      - email
+      - user_birthday
+  resource:
+    userInfoUri: https://graph.facebook.com/me/?fields=id,birthday,email,first_name,last_name,picture
+---
+spring:
+  profiles: local, test
+  data:
+    mongodb:
+      database: test-db
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+
+linkedin:
+  client:
+    clientId: 78lmssa4iu7adb
+    clientSecret: pVMRqe99Nx6Ty3mz
+
+facebook:
+  client:
+    clientId: 922149627961042
+    clientSecret: f4f7f81bd1b5efb7d6d8e0338245af08
+
+

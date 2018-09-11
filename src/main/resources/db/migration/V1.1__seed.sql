@@ -1,0 +1,4 @@
+-- INSERT INTO identifications_kinds (description) VALUES ('DNI');
+-- INSERT INTO identifications_kinds (description) VALUES ('CI');
+-- INSERT INTO identifications_kinds (description) VALUES ('RG');
+-- INSERT INTO identifications_kinds (description) VALUES ('CC');
