@@ -1,7 +1,6 @@
 package com.mm2.oauth.service;
 
 import com.mm2.oauth.domain.User;
-import com.mm2.oauth.domain.errorCodes.ErrorCodes;
 import com.mm2.oauth.exception.ServiceException;
 import com.mm2.oauth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +19,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) {
-        User existing = repository.findByUsername(user.getUsername());
+        User existing = repository.findByEmail(user.getEmail());
 
         if (existing != null)
             throw new ServiceException(
-                    "user already exists: " + user.getUsername(),
-                    ErrorCodes.USER_EXIST.code());
-//            throw new UniqueConstraintException("user already exists: " + user.getUsername());
+                    "user already exists: " + user.getEmail(),
+                    "USER_EXIST");
 
         String hash = encoder.encode(user.getPassword());
         user.setPassword(hash);
@@ -50,12 +48,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findById(Long id) {
-        return repository.findOne(id);
+    public User findById(String id) {
+        return repository.findById(id).get();
     }
 
     @Override
-    public User findByUsername(String username) {
-        return repository.findByUsername(username);
+    public User findByEmail(String username) {
+        return repository.findByEmail(username);
     }
 }

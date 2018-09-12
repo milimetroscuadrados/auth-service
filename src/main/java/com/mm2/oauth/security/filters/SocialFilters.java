@@ -1,6 +1,6 @@
 package com.mm2.oauth.security.filters;
 
-import com.mm2.oauth.service.RoleService;
+import com.mm2.oauth.domain.User;
 import com.mm2.oauth.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
@@ -30,7 +31,9 @@ import org.springframework.web.filter.CompositeFilter;
 import javax.servlet.Filter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 @Component
 @Configuration
@@ -42,12 +45,6 @@ public class SocialFilters {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private RoleService roleService;
-
-    @Autowired
-    private Sender sender;
 
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
@@ -102,7 +99,11 @@ public class SocialFilters {
 
             ClientUserDetails clientUserDetails = clientUserDetailsStrategy.getClientUserDetails(details);
 
-            User user = createOrGetUser(clientUserDetails);
+            User user = userService.findByEmail(clientUserDetails.getEmail());
+
+            if(user == null){
+                throw new UsernameNotFoundException("El usuario no se encuentra registrado con esa red social");
+            }
 
             Authentication auth =
                     new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
@@ -123,17 +124,6 @@ public class SocialFilters {
         });
 
         return filter;
-    }
-
-    private User createOrGetUser(ClientUserDetails clientUserDetails) {
-        User user = userService.findByUsername(clientUserDetails.getUsername());
-
-        if (user == null) {
-            user = userService.create(clientUserDetails.toUser());
-            this.sender.send(CreatedUserFromSocial.createFromUser(user));
-        }
-
-        return user;
     }
 
     private String createRandomPassword() {
@@ -211,15 +201,14 @@ public class SocialFilters {
         User toUser() {
             User user = new User();
 
-            user.setUsername(this.username);
+           // user.setUsername(this.username);
             user.setPassword(this.password);
             user.setEmail(this.email);
-            user.setFirstName(firstName);
-            user.setLastName(lastName);
+            user.setName(firstName);
+            user.setLastname(lastName);
             user.setPictureUrl(pictureUrl);
             user.setBirthday((birthday == null) ? null : java.sql.Date.valueOf(birthday));
-            user.setUserKind(UserKindType.normal_user);
-            user.setEnabled(true);
+           // user.setEnabled(true);
 
             return user;
         }

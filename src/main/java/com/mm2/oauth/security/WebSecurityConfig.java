@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -32,7 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
-                .antMatchers("/img/**", "/health", "/css/*", "/login/**", "/forgot", "/logout", "/oauth/*", "/users/**").permitAll()
+                .antMatchers("/health", "/login/**", "/forgot", "/logout", "/oauth/*", "/users/**").permitAll()
                 .anyRequest().authenticated()
             .and()
                 .exceptionHandling()
@@ -43,18 +44,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .permitAll()
             .and()
                 .logout()
-                .logoutSuccessHandler(
-                    (request, response, authentication) -> {
-                        String redirectUri = request.getParameter("redirectUri");
-
-                        if (redirectUri == null) {
-                            redirectStrategy.sendRedirect(request, response, "/login");
-                        } else {
-                            response.sendRedirect(redirectUri);
-                        }
-                    }
-                )
-                    .permitAll()
+                .logoutSuccessUrl("/login")
+                .permitAll()
             .and()
                 .csrf()
                     .disable()
@@ -73,5 +64,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+            web
+                .ignoring()
+                .antMatchers("/templates/**", "/css/**", "/js/**", "/img/**","/fonts/**","/ico/**");
     }
 }

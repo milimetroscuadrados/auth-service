@@ -26,10 +26,10 @@ public class UserController {
         return userService.findAll();
     }
 
-    @RequestMapping(value = "/{username}", method = RequestMethod.GET)
-    public User getByUsername(@PathVariable String username) {
-        User user = userService.findByUsername(username);
-        if (user == null) throw new EntityNotFoundException("Username: " + username + " not found.");
+    @RequestMapping(value = "/{email}", method = RequestMethod.GET)
+    public User getByEmail(@PathVariable String email) {
+        User user = userService.findByEmail(email);
+        if (user == null) throw new EntityNotFoundException("Username: " + email + " not found.");
         return user;
     }
 

@@ -1,5 +1,6 @@
 package com.mm2.oauth.security;
 
+import com.mm2.oauth.domain.User;
 import com.mm2.oauth.service.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -56,8 +57,8 @@ public class OAuth2Configuration extends AuthorizationServerConfigurerAdapter {
         // TODO persist clients details
 
         clients.inMemory()
-            .withClient("birpin-ui")
-            .secret("birpin-ui-secret")
+            .withClient("real-estate-ui")
+            .secret("real-estate-secret")
             .scopes("argentina", "peru")
             .autoApprove(true)
             .authorizedGrantTypes("authorization_code","refresh_token", "password")
@@ -76,7 +77,7 @@ public class OAuth2Configuration extends AuthorizationServerConfigurerAdapter {
                 .tokenStore(tokenStore)
                 .tokenEnhancer(tokenEnhancerChain)
                 .authenticationManager(authenticationManager)
-                .userDetailsService(userDetailsService);
+                ;//.userDetailsService(userDetailsService);
     }
 
     @Override
@@ -97,9 +98,6 @@ public class OAuth2Configuration extends AuthorizationServerConfigurerAdapter {
 
     public class CustomTokenEnhancer implements TokenEnhancer {
 
-        @Autowired
-        private GroupRepository groupRepository;
-
         @Override
         public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
             Map<String, Object> additionalInfo = new HashMap<>();
@@ -112,16 +110,11 @@ public class OAuth2Configuration extends AuthorizationServerConfigurerAdapter {
 
             User loggedUser = (User) authentication.getPrincipal();
 
-            List<Long> groupIds = loggedUser.getGroups().stream().map( Group::getId ).collect(Collectors.toList());
-
-            List<Group> groups = this.groupRepository.findAll(groupIds);
-
             additionalInfo.put("aud", audiences );
-            additionalInfo.put("first_name", loggedUser.getFirstName());
-            additionalInfo.put("last_name", loggedUser.getLastName());
+            additionalInfo.put("first_name", loggedUser.getName());
+            additionalInfo.put("last_name", loggedUser.getLastname());
             additionalInfo.put("email", loggedUser.getEmail());
             additionalInfo.put("id", loggedUser.getId());
-            additionalInfo.put("groups", groups);
             additionalInfo.putAll(accessToken.getAdditionalInformation());
 
             ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInfo);
