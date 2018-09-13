@@ -9,11 +9,6 @@ import java.security.Principal;
 @Controller
 public class SecurityController {
 
-    @RequestMapping(value="/login", method = RequestMethod.GET)
-    public String login() {
-        return "login";
-    }
-
     @RequestMapping(value="/forgot", method = RequestMethod.GET)
     public String forgotGet() {
         return "forgot";

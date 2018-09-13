@@ -1,6 +1,7 @@
 package com.mm2.oauth.security;
 
 import com.mm2.oauth.security.filters.SocialFilters;
+import com.mm2.oauth.service.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +35,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .authorizeRequests()
                 .antMatchers("/health", "/login/**", "/forgot", "/logout", "/oauth/*", "/users/**").permitAll()
-                .anyRequest().authenticated()
+                .anyRequest()
+                .authenticated()
             .and()
                 .exceptionHandling()
                 .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
@@ -66,10 +68,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+    @Bean
+    public UserDetailsService userDetailService() {
+        return new UserDetailsServiceImpl();
+    }
+
     @Override
     public void configure(WebSecurity web) throws Exception {
             web
                 .ignoring()
-                .antMatchers("/templates/**", "/css/**", "/js/**", "/img/**","/fonts/**","/ico/**");
+                .antMatchers("/templates/**", "/css/**", "/js/**", "/img/**","/fonts/**","/ico/**", "/favicon.ico");
     }
 }
