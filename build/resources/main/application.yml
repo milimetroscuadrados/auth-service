@@ -1,37 +1,40 @@
-spring:
-  application:
-    name: oauth-service
-
 server:
   port: 9999
   servlet:
     context-path: /uaa
 
-linkedin:
-  client:
-    clientId: ${SOCIAL_LINKEDIN_APP_ID}
-    clientSecret: ${SOCIAL_LINKEDIN_APP_SECRET}
-    accessTokenUri: https://www.linkedin.com/oauth/v2/accessToken
-    userAuthorizationUri: https://www.linkedin.com/oauth/v2/authorization
-    clientAuthenticationScheme: form
-  resource:
-    userInfoUri: https://api.linkedin.com/v1/people/~:(id,first-name,last-name,picture-url,email-address)?format=json
+security:
+  oauth2:
+    sso:
+      login-path: /login
+    resource:
+      jwt:
+        keyValue: |
+          -----BEGIN PUBLIC KEY-----
+          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApWgdT5SIMEoRwsKbxrIS
+          w8NsROeri5zqUAUXx3haXtLqsgep6o9+j1yJ2OhwIjKqDgjUimeKgTPFCYawK8Tn
+          aAYq7EDjGVWzP5W86+7DIkADQMBm4X5PU13YG1RUoSFI+niX19c43spGwhGIBxFg
+          3gqtr/FQbTXO4MUcvmpu36egftC234mPNvTxy/mYFI8UHvhXxC/iChhd7sR5/MsL
+          cI8jb9gvQFoYaIhoI/6YveSTjfx60iSthWWMInvU5JWyCNLXlq/drsp5xj58/YXC
+          rzF7gdwZlC3NGm/4GJfbiZRk7ELTHtaCxuOq9lWYqcXXMFe0JwMZPEXaICWAvd+d
+          ewIDAQAB
+          -----END PUBLIC KEY-----
 
-facebook:
-  client:
-    clientId: ${SOCIAL_FACEBOOK_APP_ID}
-    clientSecret: ${SOCIAL_FACEBOOK_APP_SECRET}
-    accessTokenUri: https://graph.facebook.com/oauth/access_token
-    userAuthorizationUri: https://www.facebook.com/dialog/oauth
-    tokenName: oauth_token
-    authenticationScheme: query
-    clientAuthenticationScheme: form
-    scope:
-      - public_profile
-      - email
-      - user_birthday
-  resource:
-    userInfoUri: https://graph.facebook.com/me/?fields=id,birthday,email,first_name,last_name,picture
+spring:
+  application:
+    name: oauth-service
+  security:
+    oauth2:
+      client:
+        registration:
+          facebook:
+            client-id: 550797672034747
+            client-secret: 57e54282274625bbeb8fc08cd0397684
+            scope:
+              - public_profile
+              - email
+              - user_birthday
+
 ---
 spring:
   profiles: local, test
@@ -48,10 +51,3 @@ linkedin:
   client:
     clientId: 787sqfvlxqq0dn
     clientSecret: jA0mXDam1gDnGUdV
-
-facebook:
-  client:
-    clientId: 550797672034747
-    clientSecret: 57e54282274625bbeb8fc08cd0397684
-
-

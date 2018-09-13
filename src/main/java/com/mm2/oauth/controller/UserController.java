@@ -38,9 +38,9 @@ public class UserController {
         userService.modify(user);
     }
 
-//    @PreAuthorize("#oauth2.hasScope('read')")
     @RequestMapping(value="/current", method = RequestMethod.POST)
-    public Principal current(Principal principal) {
-        return principal;
+    @ResponseBody
+    public Principal current(Principal user) {
+        return user;
     }
 }
